@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMFBY Test Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f9; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #28a745; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px;}
+        button:hover { background: #218838; }
+        .survey-row { display: flex; gap: 10px; margin-bottom: 10px; border: 1px dashed #ccc; padding: 10px; background: #fafafa;}
+        #status { margin-top: 15px; font-weight: bold; color: blue; text-align: center;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>PMFBY Mock Portal</h2>
+        
+        <div class="form-group">
+            <label>बैंक खाता संख्या (Bank Account)</label>
+            <!-- असली पोर्टल में यहाँ खाता डालते ही नाम आ जाता है -->
+            <input type="text" id="accountNo" placeholder="यहाँ खाता संख्या डालें">
+        </div>
+
+        <div class="form-group">
+            <label>किसान का नाम (Auto-filled)</label>
+            <input type="text" id="farmerName" readonly placeholder="खाता संख्या डालने पर अपने आप भरेगा">
+        </div>
+
+        <hr>
+        <h3>सर्वे नंबर (Survey Numbers)</h3>
+        <div id="surveyContainer">
+            <!-- सर्वे नंबर के रो यहाँ आएंगे -->
+        </div>
+        
+        <button type="button" id="addSurveyBtn" style="background: #007bff;">+ नया सर्वे नंबर जोड़ें</button>
+        
+        <hr>
+        <button type="button" id="saveBtn">फॉर्म सेव करें (Save)</button>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // नकली ऑटोफिल (जब खाता संख्या डालेंगे तो नाम आएगा)
+        document.getElementById('accountNo').addEventListener('input', function() {
+            const acc = this.value;
+            const nameField = document.getElementById('farmerName');
+            if (acc.length > 3) {
+                nameField.value = "राम कुमार (टेस्ट डेटा)"; // नकली नाम
+            } else {
+                nameField.value = "";
+            }
+        });
+
+        // सर्वे नंबर जोड़ने का बटन
+        document.getElementById('addSurveyBtn').addEventListener('click', function() {
+            const container = document.getElementById('surveyContainer');
+            const div = document.createElement('div');
+            div.className = 'survey-row';
+            div.innerHTML = `
+                <input type="text" class="surveyNo" placeholder="सर्वे नंबर (उदा: 101/2)">
+                <input type="text" class="area" placeholder="रकबा (उदा: 0.5)">
+            `;
+            container.appendChild(div);
+        });
+
+        // सेव बटन
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            const acc = document.getElementById('accountNo').value;
+            const surveys = document.querySelectorAll('.survey-row');
+            let count = 0;
+            surveys.forEach(row => {
+                const sNo = row.querySelector('.surveyNo').value;
+                if(sNo) count++;
+            });
+            
+            if(acc && count > 0) {
+                document.getElementById('status').innerText = `✅ सफलतापूर्वक सेव हो गया! (खाता: ${acc}, सर्वे: ${count})`;
+                document.getElementById('status').style.color = "green";
+                // अगले टेस्ट के लिए फॉर्म खाली करें
+                document.getElementById('accountNo').value = "";
+                document.getElementById('farmerName').value = "";
+                document.getElementById('surveyContainer').innerHTML = "";
+            } else {
+                document.getElementById('status').innerText = "❌ कृपया खाता और सर्वे नंबर भरें!";
+                document.getElementById('status').style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>
